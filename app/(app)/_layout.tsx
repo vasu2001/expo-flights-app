@@ -12,7 +12,7 @@ export default function AppLayout() {
 
   // If user is not authenticated, redirect to login
   if (!user) {
-    return <Redirect href="/(auth)/login" />;
+    return <Redirect href="/login" />;
   }
 
   return (

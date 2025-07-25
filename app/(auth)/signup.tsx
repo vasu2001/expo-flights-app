@@ -1,8 +1,12 @@
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
 import React, { useState } from "react";
+import { View } from "react-native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "~/lib/firebase";
-import { router } from "expo-router";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
+import { Text } from "~/components/ui/text";
+import { Label } from "~/components/ui/label";
 
 const SignupScreen = () => {
   const [email, setEmail] = useState("");
@@ -19,52 +23,49 @@ const SignupScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Signup</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      {error && <Text style={styles.error}>{error}</Text>}
-      <Button title="Signup" onPress={handleSignup} />
-      <Button title="Log in" onPress={() => router.replace("/login")} />
+    <View className="flex-1 justify-center p-6">
+      <Card className="w-full max-w-sm mx-auto">
+        <CardHeader>
+          <CardTitle className="text-center">Signup</CardTitle>
+        </CardHeader>
+        <CardContent className="gap-4">
+          <View>
+            <Label nativeID="email-label">Email</Label>
+            <Input
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              autoComplete="email"
+              aria-labelledby="email-label"
+            />
+          </View>
+          <View>
+            <Label nativeID="password-label">Password</Label>
+            <Input
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              autoComplete="password"
+              aria-labelledby="password-label"
+            />
+          </View>
+          {error && (
+            <Text className="text-destructive text-center text-sm">
+              {error}
+            </Text>
+          )}
+          <View className="gap-2">
+            <Button onPress={handleSignup} className="w-full">
+              <Text>Signup</Text>
+            </Button>
+          </View>
+        </CardContent>
+      </Card>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 16,
-    textAlign: "center",
-  },
-  input: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingLeft: 8,
-  },
-  error: {
-    color: "red",
-    marginBottom: 12,
-    textAlign: "center",
-  },
-});
 
 export default SignupScreen;
