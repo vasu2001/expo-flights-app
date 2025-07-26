@@ -13,7 +13,7 @@ export * from "./utils";
 // Re-export commonly used types for convenience
 export type {
   ApiResponse,
-  Location,
+  AirportLocation as Location,
   FlightItinerary,
   FlightLeg,
   FlightSegment,

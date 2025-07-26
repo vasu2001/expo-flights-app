@@ -55,13 +55,7 @@ export function useSearchFlights(params: SearchFlightsRequest) {
   return useQuery({
     queryKey: flightQueryKeys.searchFlights(params),
     queryFn: () => flightAPI.searchFlights(params),
-    enabled: !!(
-      params.originSkyId &&
-      params.destinationSkyId &&
-      params.originEntityId &&
-      params.destinationEntityId &&
-      params.date
-    ),
+    enabled: false,
     staleTime: 2 * 60 * 1000, // 2 minutes - flight data changes frequently
     gcTime: 10 * 60 * 1000, // 10 minutes
   });

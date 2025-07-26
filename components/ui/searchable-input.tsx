@@ -13,19 +13,19 @@ import {
 import { ChevronDown } from "~/lib/icons/ChevronDown";
 import { Label } from "./label";
 
-export interface SearchableInputOption {
-  value: string;
+export interface SearchableInputOption<T> {
+  value: T;
   label: string;
   description?: string;
 }
 
-interface SearchableInputProps {
+interface SearchableInputProps<T> {
   placeholder?: string;
-  selectedValue?: string;
+  selectedValue?: T;
   selectedLabel?: string;
   onSearchChange?: (query: string) => void;
-  onSelect?: (option: SearchableInputOption) => void;
-  options: SearchableInputOption[];
+  onSelect?: (option: SearchableInputOption<T>) => void;
+  options: SearchableInputOption<T>[];
   className?: string;
   disabled?: boolean;
   label?: string;
@@ -33,7 +33,7 @@ interface SearchableInputProps {
   error?: string;
 }
 
-export function SearchableInput({
+export function SearchableInput<T>({
   placeholder,
   selectedValue,
   selectedLabel,
@@ -45,7 +45,7 @@ export function SearchableInput({
   label,
   loading,
   error,
-}: SearchableInputProps) {
+}: SearchableInputProps<T>) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState("");
 
@@ -57,7 +57,7 @@ export function SearchableInput({
     }
   };
 
-  const handleSelectOption = (option: SearchableInputOption) => {
+  const handleSelectOption = (option: SearchableInputOption<T>) => {
     setIsOpen(false);
     onSelect?.(option);
   };
@@ -75,7 +75,7 @@ export function SearchableInput({
     onSearchChange?.("");
   };
 
-  const displayValue = selectedLabel || selectedValue || "";
+  const displayValue = selectedLabel || "";
 
   return (
     <View className={cn("relative", className)}>
@@ -128,7 +128,6 @@ export function SearchableInput({
             ) : options.length > 0 ? (
               options.map((option) => (
                 <DropdownMenuItem
-                  key={option.value}
                   onPress={() => handleSelectOption(option)}
                   className="flex-col items-start p-3"
                 >

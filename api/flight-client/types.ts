@@ -55,7 +55,7 @@ export interface LocationNavigation {
   relevantHotelParams: RelevantHotelParams;
 }
 
-export interface Location {
+export interface AirportLocation {
   presentation: {
     title: string;
     suggestionTitle: string;
@@ -201,15 +201,15 @@ export interface FilterStats {
 
 // Nearby Airports Response
 export interface NearbyAirportsData {
-  current: Location;
-  nearby: Location[];
-  recent: Location[];
+  current: AirportLocation;
+  nearby: AirportLocation[];
+  recent: AirportLocation[];
 }
 
 export type NearbyAirportsResponse = ApiResponse<NearbyAirportsData>;
 
 // Search Airports Response
-export type SearchAirportsResponse = ApiResponse<Location[]>;
+export type SearchAirportsResponse = ApiResponse<AirportLocation[]>;
 
 // Search Flights Response
 export interface SearchFlightsData {

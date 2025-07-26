@@ -16,14 +16,21 @@ import {
 } from "~/components/ui/searchable-input";
 import { router } from "expo-router";
 import * as Location from "expo-location";
-import { useNearbyAirports, useSearchAirports } from "~/lib/flight-queries";
+import {
+  useNearbyAirports,
+  useSearchAirports,
+  useSearchFlights,
+} from "~/lib/flight-queries";
 import { DatePicker } from "~/components/ui/date-picker";
+import moment from "moment";
+import { AirportLocation } from "~/api/flight-client";
 
 export default function HomeScreen() {
-  const [fromLocation, setFromLocation] = React.useState("");
-  const [fromLocationLabel, setFromLocationLabel] = React.useState("");
-  const [toLocation, setToLocation] = React.useState("");
-  const [toLocationLabel, setToLocationLabel] = React.useState("");
+  const [fromLocation, setFromLocation] =
+    React.useState<AirportLocation | null>(null);
+  const [toLocation, setToLocation] = React.useState<AirportLocation | null>(
+    null
+  );
   const [departureDate, setDepartureDate] = React.useState("");
   const [returnDate, setReturnDate] = React.useState("");
 
@@ -36,36 +43,28 @@ export default function HomeScreen() {
   const fromAirportSearchResults = useAirportSearch(fromSearchQuery);
   const toAirportSearchResults = useAirportSearch(toSearchQuery);
 
-  const featuredFlights = [
-    {
-      id: 1,
-      from: "New York",
-      to: "Los Angeles",
-      airline: "Delta Airlines",
-      departure: "10:30 AM",
-      arrival: "1:45 PM",
-      price: "$299",
-      duration: "5h 15m",
-      stops: "Direct",
-    },
-    {
-      id: 2,
-      from: "Chicago",
-      to: "Miami",
-      airline: "American Airlines",
-      departure: "2:15 PM",
-      arrival: "5:30 PM",
-      price: "$189",
-      duration: "3h 15m",
-      stops: "Direct",
-    },
-  ];
+  //flights search query
+  const {
+    data: flightsSearchData,
+    refetch: refetchFlightsSearch,
+    isLoading: isFlightsSearchLoading,
+  } = useSearchFlights({
+    originSkyId: fromLocation?.navigation.relevantFlightParams.skyId || "",
+    originEntityId:
+      fromLocation?.navigation.relevantFlightParams.entityId || "",
+    destinationSkyId: toLocation?.navigation.relevantFlightParams.skyId || "",
+    destinationEntityId:
+      toLocation?.navigation.relevantFlightParams.entityId || "",
+    date: departureDate,
+    returnDate: returnDate,
+    adults: 1,
+    childrens: 0,
+    infants: 0,
+    cabinClass: "economy",
+  });
 
-  const handleFlightPress = (flight: any) => {
-    router.push({
-      pathname: "/(app)/flight-details" as any,
-      params: { flight: JSON.stringify(flight) },
-    });
+  const handleFlightSearch = async () => {
+    refetchFlightsSearch();
   };
 
   console.log("homescreen render");
@@ -94,26 +93,24 @@ export default function HomeScreen() {
               label="From"
               placeholder="Search departure airport"
               selectedValue={fromLocation}
-              selectedLabel={fromLocationLabel}
+              selectedLabel={fromLocation?.presentation.suggestionTitle}
               onSearchChange={setFromSearchQuery}
               options={
                 fromSearchQuery ? fromAirportSearchResults : nearbyAirports
               }
               onSelect={(option) => {
                 setFromLocation(option.value);
-                setFromLocationLabel(option.label);
               }}
             />
             <SearchableInput
               label="To"
               placeholder="Search destination airport"
               selectedValue={toLocation}
-              selectedLabel={toLocationLabel}
+              selectedLabel={toLocation?.presentation.suggestionTitle}
               onSearchChange={setToSearchQuery}
               options={toSearchQuery ? toAirportSearchResults : nearbyAirports}
               onSelect={(option) => {
                 setToLocation(option.value);
-                setToLocationLabel(option.label);
               }}
             />
             <View className="gap-1">
@@ -122,7 +119,7 @@ export default function HomeScreen() {
                 value={departureDate}
                 onValueChange={setDepartureDate}
                 placeholder="Select departure date"
-                minDate={new Date().toISOString()}
+                minDate={moment().format("YYYY-MM-DD")}
               />
             </View>
             <View className="gap-1">
@@ -131,13 +128,10 @@ export default function HomeScreen() {
                 value={returnDate}
                 onValueChange={setReturnDate}
                 placeholder="Select return date"
-                minDate={departureDate || new Date().toISOString()}
+                minDate={departureDate || moment().format("YYYY-MM-DD")}
               />
             </View>
-            <Button
-              className="w-full mt-2"
-              onPress={() => handleFlightPress(featuredFlights[0])}
-            >
+            <Button className="w-full mt-2" onPress={handleFlightSearch}>
               <Text>Search Flights</Text>
             </Button>
           </CardContent>
@@ -170,34 +164,50 @@ const useUserLocation = () => {
   return userLocation;
 };
 
-const useNearbyAirportsPrefill = (): SearchableInputOption[] => {
-  const userLocation = useUserLocation();
-  const nearbyAirports = useNearbyAirports(
-    userLocation
-      ? {
-          lat: userLocation?.coords.latitude,
-          lng: userLocation?.coords.longitude,
-        }
-      : null
-  );
+const useNearbyAirportsPrefill =
+  (): SearchableInputOption<AirportLocation>[] => {
+    const userLocation = useUserLocation();
+    const nearbyAirports = useNearbyAirports(
+      userLocation
+        ? {
+            lat: userLocation?.coords.latitude,
+            lng: userLocation?.coords.longitude,
+          }
+        : null
+    );
 
-  return nearbyAirports.isFetched
-    ? nearbyAirports.data?.data.nearby?.map((airport) => ({
-        value: airport.navigation.relevantFlightParams.skyId,
-        label: airport.presentation.suggestionTitle,
-        description: airport.presentation.subtitle,
-      })) || []
-    : [];
-};
+    const airportMapper = (airport: AirportLocation) => ({
+      value: airport,
+      label: airport.presentation.suggestionTitle,
+      description: airport.presentation.subtitle,
+    });
 
-const useAirportSearch = (searchQuery: string): SearchableInputOption[] => {
+    const nearbyAirportOptions: SearchableInputOption<AirportLocation>[] = [];
+
+    if (nearbyAirports.data?.data.current) {
+      nearbyAirportOptions.push(
+        airportMapper(nearbyAirports.data.data.current)
+      );
+    }
+    if (nearbyAirports.data?.data.nearby) {
+      nearbyAirportOptions.push(
+        ...nearbyAirports.data.data.nearby.map(airportMapper)
+      );
+    }
+
+    return nearbyAirportOptions;
+  };
+
+const useAirportSearch = (
+  searchQuery: string
+): SearchableInputOption<AirportLocation>[] => {
   const airportSearch = useSearchAirports({
     query: searchQuery,
   });
 
   return airportSearch.isFetched
     ? airportSearch.data?.data.map((airport) => ({
-        value: airport.navigation.relevantFlightParams.skyId,
+        value: airport,
         label: airport.presentation.suggestionTitle,
         description: airport.presentation.subtitle,
       })) || []
