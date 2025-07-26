@@ -5,7 +5,7 @@ export interface FlightAPIConfig {
 }
 
 export const DEFAULT_CONFIG: FlightAPIConfig = {
-  baseUrl: "https://skyscanner-api.p.rapidapi.com",
-  apiKey: process.env.RAPIDAPI_KEY || "",
+  baseUrl: "https://sky-scrapper.p.rapidapi.com",
+  apiKey: "300a6282e3msh26159f3298ad310p16b0bfjsn2f04e757b119",
   timeout: 30000,
 };

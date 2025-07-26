@@ -16,6 +16,8 @@ import {
   FlightDetailsResponse,
 } from "./types";
 
+const MOCK_DATA = true;
+
 export class FlightAPIError extends Error {
   constructor(message: string, public status?: number, public response?: any) {
     super(message);
@@ -55,7 +57,7 @@ export class FlightAPI {
         method: "GET",
         headers: {
           "X-RapidAPI-Key": this.config.apiKey,
-          "X-RapidAPI-Host": "skyscanner-api.p.rapidapi.com",
+          "X-RapidAPI-Host": "sky-scrapper.p.rapidapi.com",
           "Content-Type": "application/json",
         },
         signal: controller.signal,
@@ -108,7 +110,9 @@ export class FlightAPI {
   async getNearbyAirports(
     params: NearbyAirportsRequest
   ): Promise<NearbyAirportsResponse> {
-    return nearbyAirportsResponseSample;
+    if (MOCK_DATA) {
+      return nearbyAirportsResponseSample;
+    }
     return this.makeRequest<NearbyAirportsResponse>(
       "/api/v1/flights/getNearByAirports",
       params
@@ -123,7 +127,9 @@ export class FlightAPI {
   async searchAirports(
     params: SearchAirportsRequest
   ): Promise<SearchAirportsResponse> {
-    return searchAirportsResponseSample;
+    if (MOCK_DATA) {
+      return searchAirportsResponseSample;
+    }
     return this.makeRequest<SearchAirportsResponse>(
       "/api/v1/flights/searchAirport",
       params
@@ -138,9 +144,11 @@ export class FlightAPI {
   async searchFlights(
     params: SearchFlightsRequest
   ): Promise<SearchFlightsResponse> {
-    return searchFlightsResponseSample;
+    if (MOCK_DATA) {
+      return searchFlightsResponseSample;
+    }
     return this.makeRequest<SearchFlightsResponse>(
-      "/api/v1/flights/searchFlights",
+      "/api/v2/flights/searchFlights",
       params
     );
   }
@@ -153,7 +161,9 @@ export class FlightAPI {
   async getFlightDetails(
     params: FlightDetailsRequest
   ): Promise<FlightDetailsResponse> {
-    return flightDetailsResponseSample;
+    if (MOCK_DATA) {
+      return flightDetailsResponseSample;
+    }
     return this.makeRequest<FlightDetailsResponse>(
       "/api/v1/flights/getFlightDetails",
       params

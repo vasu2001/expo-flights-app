@@ -11,17 +11,21 @@ import { Label } from "~/components/ui/label";
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string>("");
   const { signIn } = useSession();
 
   const handleLogin = async () => {
     try {
-      console.log(email, password);
-      signIn(email, password);
+      const success = await signIn(email, password);
+      if (!success) {
+        setError("Invalid email or password");
+      }
     } catch (err: any) {
       setError(err.message);
     }
   };
+
+  console.log("error", error);
 
   return (
     <View className="flex-1 justify-center p-6">

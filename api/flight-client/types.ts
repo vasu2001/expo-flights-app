@@ -18,6 +18,7 @@ export interface FlightPlace {
     name: string;
     type: string; // Changed from union type to string to match sample
   };
+  country?: string; // Added to match sample
 }
 
 export interface AirportInfo {
@@ -26,6 +27,8 @@ export interface AirportInfo {
   displayCode: string;
   city: string;
   isHighlighted: boolean;
+  entityId?: string; // Added to match sample
+  country?: string; // Added to match sample
 }
 
 export interface LocationPresentation {
@@ -86,10 +89,12 @@ export interface Carrier {
   name: string;
   alternateId?: string;
   allianceId?: number;
+  displayCode?: string; // Added to match sample
 }
 
 export interface Carriers {
   marketing: Carrier[];
+  operating?: Carrier[]; // Added to match sample
   operationType: string; // Changed from union type to string to match sample
 }
 
@@ -104,6 +109,7 @@ export interface FlightSegment {
   flightNumber: string;
   marketingCarrier: Carrier;
   operatingCarrier: Carrier;
+  transportMode?: string; // Added to match sample
 }
 
 // Flight Leg Types
@@ -125,6 +131,7 @@ export interface FlightLeg {
 export interface Price {
   raw: number;
   formatted: string;
+  pricingOptionId?: string; // Added to match sample
 }
 
 // Fare Policy Types
@@ -148,8 +155,9 @@ export interface FlightItinerary {
   isSelfTransfer: boolean;
   isProtectedSelfTransfer: boolean;
   farePolicy: FarePolicy;
+  fareAttributes?: Record<string, any>; // Added to match sample
   eco?: EcoInfo;
-  tags: string[];
+  tags?: string[]; // Made optional to match sample
   isMashUp: boolean;
   hasFlexibleOptions: boolean;
   score: number;
@@ -159,12 +167,14 @@ export interface FlightItinerary {
 export interface SearchContext {
   status: string; // Changed from union type to string to match sample
   totalResults: number;
+  sessionId: string;
 }
 
 // Filter Stats Types
 export interface AirportFilter {
   id: string;
   name: string;
+  entityId?: string; // Added to match sample
 }
 
 export interface CityAirports {
@@ -176,11 +186,15 @@ export interface CarrierFilter {
   id: number;
   logoUrl: string;
   name: string;
+  alternateId?: string; // Added to match sample
+  allianceId?: number; // Added to match sample
+  minPrice?: string; // Added to match sample
 }
 
 export interface StopPrice {
   isPresent: boolean;
   formattedPrice?: string;
+  rawPrice?: number; // Added to match sample
 }
 
 export interface StopPrices {
@@ -189,14 +203,29 @@ export interface StopPrices {
   twoOrMore: StopPrice;
 }
 
+export interface Alliance {
+  id: number;
+  name: string;
+}
+
 export interface FilterStats {
   duration: {
     min: number;
     max: number;
+    multiCityMin?: number; // Added to match sample
+    multiCityMax?: number; // Added to match sample
+  };
+  total?: number; // Added to match sample
+  hasCityOpenJaw?: boolean; // Added to match sample
+  multipleCarriers?: {
+    // Added to match sample
+    minPrice: string;
+    rawMinPrice: number | null;
   };
   airports: CityAirports[];
   carriers: CarrierFilter[];
   stopPrices: StopPrices;
+  alliances?: Alliance[]; // Added to match sample
 }
 
 // Nearby Airports Response
@@ -217,6 +246,8 @@ export interface SearchFlightsData {
   itineraries: FlightItinerary[];
   messages: string[];
   filterStats: FilterStats;
+  flightsSessionId?: string; // Added to match sample
+  destinationImageUrl?: string; // Added to match sample
 }
 
 export type SearchFlightsResponse = ApiResponse<SearchFlightsData>;

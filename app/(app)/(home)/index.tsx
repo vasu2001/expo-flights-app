@@ -26,6 +26,7 @@ import { FlightResultsList } from "~/components/ui/flight-results-list";
 import moment from "moment";
 import { AirportLocation, FlightItinerary } from "~/api/flight-client";
 import { searchFlightsResponseSample } from "~/api/flight-client/sample-response";
+import { useDebounce } from "~/lib/useDebounce";
 
 export default function HomeScreen() {
   const [fromLocation, setFromLocation] =
@@ -75,7 +76,7 @@ export default function HomeScreen() {
     router.push({
       pathname: "/(app)/(home)/flight-details",
       params: {
-        sessionId: flightsSearchData?.sessionId,
+        sessionId: flightsSearchData?.data?.context.sessionId,
         itineraryId: flight.id,
         legs: JSON.stringify(
           flight.legs.map((leg) => ({
@@ -87,8 +88,6 @@ export default function HomeScreen() {
       },
     });
   };
-
-  console.log("homescreen render");
 
   return (
     <View className="flex-1 bg-secondary/30">
@@ -183,10 +182,12 @@ const useUserLocation = () => {
 
   const getUserLocation = async () => {
     if (status?.granted) {
-      const location = await Location.getLastKnownPositionAsync({
-        maxAge: 1000 * 60 * 60, // 1 hour
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Low,
       });
-      setUserLocation(location);
+      if (location) {
+        setUserLocation(location);
+      }
     } else {
       requestPermission();
     }
@@ -236,8 +237,10 @@ const useNearbyAirportsPrefill =
 const useAirportSearch = (
   searchQuery: string
 ): SearchableInputOption<AirportLocation>[] => {
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+
   const airportSearch = useSearchAirports({
-    query: searchQuery,
+    query: debouncedSearchQuery,
   });
 
   return airportSearch.isFetched

@@ -13,12 +13,12 @@ import {
 import { auth } from "./firebase";
 
 const AuthContext = createContext<{
-  signIn: (email: string, password: string) => void;
+  signIn: (email: string, password: string) => Promise<boolean>;
   signOut: () => void;
   user: User | null;
   initialized: boolean;
 }>({
-  signIn: (email: string, password: string) => null,
+  signIn: (email: string, password: string) => Promise.resolve(false),
   signOut: () => null,
   user: null,
   initialized: false,
@@ -57,17 +57,19 @@ export function SessionProvider({ children }: PropsWithChildren) {
         signIn: async (email: string, password: string) => {
           try {
             await signInWithEmailAndPassword(auth, email, password);
+            return true;
           } catch (error) {
             console.error("Error signing in:", error);
-            throw error;
+            return false;
           }
         },
         signOut: async () => {
           try {
             await auth.signOut();
+            return true;
           } catch (error) {
             console.error("Error signing out:", error);
-            throw error;
+            return false;
           }
         },
         user,

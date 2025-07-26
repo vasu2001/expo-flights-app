@@ -9,6 +9,8 @@ import type {
   SearchFlightsResponse,
   FlightDetailsRequest,
 } from "../api/flight-client";
+// @ts-ignore
+import debounce from "lodash.debounce";
 
 // Create a singleton instance of the FlightAPI
 const flightAPI = new FlightAPI();
@@ -17,13 +19,13 @@ const flightAPI = new FlightAPI();
 export const flightQueryKeys = {
   all: ["flights"] as const,
   nearbyAirports: (params: NearbyAirportsRequest) =>
-    ["flights", "nearbyAirports", params] as const,
+    ["flights", "nearbyAirports", JSON.stringify(params)] as const,
   searchAirports: (query: string) =>
-    ["flights", "searchAirports", query] as const,
+    ["flights", "searchAirports", JSON.stringify(query)] as const,
   searchFlights: (params: SearchFlightsRequest) =>
-    ["flights", "searchFlights", params] as const,
+    ["flights", "searchFlights", JSON.stringify(params)] as const,
   flightDetails: (params: FlightDetailsRequest) =>
-    ["flights", "flightDetails", params] as const,
+    ["flights", "flightDetails", JSON.stringify(params)] as const,
 } as const;
 
 /**
@@ -69,7 +71,7 @@ export function useFlightDetails(params: FlightDetailsRequest) {
     queryKey: flightQueryKeys.flightDetails(params),
     queryFn: () => flightAPI.getFlightDetails(params),
     enabled: true,
-    staleTime: 2 * 60 * 1000, // 2 minutes - flight data changes frequently
+    staleTime: 10 * 60 * 1000, // 2 minutes - flight data changes frequently
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
 }
