@@ -11,8 +11,9 @@ import {
   DropdownMenuTrigger,
 } from "./dropdown-menu";
 import { ChevronDown } from "~/lib/icons/ChevronDown";
+import { Label } from "./label";
 
-interface SearchableInputOption {
+export interface SearchableInputOption {
   value: string;
   label: string;
   description?: string;
@@ -78,11 +79,7 @@ export function SearchableInput({
 
   return (
     <View className={cn("relative", className)}>
-      {label && (
-        <Text className="text-sm font-medium mb-2 text-foreground">
-          {label}
-        </Text>
-      )}
+      <Label>{label}</Label>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

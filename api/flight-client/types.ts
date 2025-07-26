@@ -56,10 +56,27 @@ export interface LocationNavigation {
 }
 
 export interface Location {
-  skyId: string;
-  entityId: string;
-  presentation: LocationPresentation;
-  navigation: LocationNavigation;
+  presentation: {
+    title: string;
+    suggestionTitle: string;
+    subtitle: string;
+  };
+  navigation: {
+    entityId: string;
+    entityType: string;
+    localizedName: string;
+    relevantFlightParams: {
+      skyId: string;
+      entityId: string;
+      flightPlaceType: string;
+      localizedName: string;
+    };
+    relevantHotelParams: {
+      entityId: string;
+      entityType: string;
+      localizedName: string;
+    };
+  };
 }
 
 // Carrier/Airline Types

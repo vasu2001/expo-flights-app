@@ -1,5 +1,9 @@
 import { DEFAULT_CONFIG, FlightAPIConfig } from "./config";
 import {
+  nearbyAirportsResponseSample,
+  searchAirportsResponseSample,
+} from "./sample-response";
+import {
   NearbyAirportsRequest,
   NearbyAirportsResponse,
   SearchAirportsRequest,
@@ -101,6 +105,7 @@ export class FlightAPI {
   async getNearbyAirports(
     params: NearbyAirportsRequest
   ): Promise<NearbyAirportsResponse> {
+    return nearbyAirportsResponseSample;
     return this.makeRequest<NearbyAirportsResponse>(
       "/api/v1/flights/getNearByAirports",
       {
@@ -118,6 +123,7 @@ export class FlightAPI {
   async searchAirports(
     params: SearchAirportsRequest
   ): Promise<SearchAirportsResponse> {
+    return searchAirportsResponseSample;
     return this.makeRequest<SearchAirportsResponse>(
       "/api/v1/flights/searchAirport",
       {

@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useEffect } from "react";
 import { View, ScrollView } from "react-native";
 import { Button } from "~/components/ui/button";
 import {
@@ -9,10 +9,15 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Text } from "~/components/ui/text";
-import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { SearchableInput } from "~/components/ui/searchable-input";
+import {
+  SearchableInput,
+  SearchableInputOption,
+} from "~/components/ui/searchable-input";
 import { router } from "expo-router";
+import * as Location from "expo-location";
+import { useNearbyAirports, useSearchAirports } from "~/lib/flight-queries";
+import { DatePicker } from "~/components/ui/date-picker";
 
 export default function HomeScreen() {
   const [fromLocation, setFromLocation] = React.useState("");
@@ -20,89 +25,16 @@ export default function HomeScreen() {
   const [toLocation, setToLocation] = React.useState("");
   const [toLocationLabel, setToLocationLabel] = React.useState("");
   const [departureDate, setDepartureDate] = React.useState("");
+  const [returnDate, setReturnDate] = React.useState("");
 
-  // Search queries for API calls
+  // Search queries for airport API calls
   const [fromSearchQuery, setFromSearchQuery] = React.useState("");
   const [toSearchQuery, setToSearchQuery] = React.useState("");
 
-  // Sample airport data
-  const airports = [
-    {
-      value: "JFK",
-      label: "John F. Kennedy International Airport",
-      description: "New York, NY",
-    },
-    {
-      value: "LAX",
-      label: "Los Angeles International Airport",
-      description: "Los Angeles, CA",
-    },
-    {
-      value: "ORD",
-      label: "O'Hare International Airport",
-      description: "Chicago, IL",
-    },
-    {
-      value: "DFW",
-      label: "Dallas/Fort Worth International Airport",
-      description: "Dallas, TX",
-    },
-    {
-      value: "ATL",
-      label: "Hartsfield-Jackson Atlanta International Airport",
-      description: "Atlanta, GA",
-    },
-    {
-      value: "DEN",
-      label: "Denver International Airport",
-      description: "Denver, CO",
-    },
-    {
-      value: "SFO",
-      label: "San Francisco International Airport",
-      description: "San Francisco, CA",
-    },
-    {
-      value: "MIA",
-      label: "Miami International Airport",
-      description: "Miami, FL",
-    },
-    {
-      value: "SEA",
-      label: "Seattle-Tacoma International Airport",
-      description: "Seattle, WA",
-    },
-    {
-      value: "LAS",
-      label: "McCarran International Airport",
-      description: "Las Vegas, NV",
-    },
-    {
-      value: "BOS",
-      label: "Boston Logan International Airport",
-      description: "Boston, MA",
-    },
-    {
-      value: "PHX",
-      label: "Phoenix Sky Harbor International Airport",
-      description: "Phoenix, AZ",
-    },
-    {
-      value: "IAH",
-      label: "George Bush Intercontinental Airport",
-      description: "Houston, TX",
-    },
-    {
-      value: "MCO",
-      label: "Orlando International Airport",
-      description: "Orlando, FL",
-    },
-    {
-      value: "CLT",
-      label: "Charlotte Douglas International Airport",
-      description: "Charlotte, NC",
-    },
-  ];
+  //airport search results
+  const nearbyAirports = useNearbyAirportsPrefill();
+  const fromAirportSearchResults = useAirportSearch(fromSearchQuery);
+  const toAirportSearchResults = useAirportSearch(toSearchQuery);
 
   const featuredFlights = [
     {
@@ -136,6 +68,8 @@ export default function HomeScreen() {
     });
   };
 
+  console.log("homescreen render");
+
   return (
     <ScrollView className="flex-1 bg-secondary/30">
       <View className="p-6 gap-6">
@@ -162,11 +96,9 @@ export default function HomeScreen() {
               selectedValue={fromLocation}
               selectedLabel={fromLocationLabel}
               onSearchChange={setFromSearchQuery}
-              options={airports.filter((airport) =>
-                airport.label
-                  .toLowerCase()
-                  .includes(fromSearchQuery.toLowerCase())
-              )}
+              options={
+                fromSearchQuery ? fromAirportSearchResults : nearbyAirports
+              }
               onSelect={(option) => {
                 setFromLocation(option.value);
                 setFromLocationLabel(option.label);
@@ -178,18 +110,28 @@ export default function HomeScreen() {
               selectedValue={toLocation}
               selectedLabel={toLocationLabel}
               onSearchChange={setToSearchQuery}
-              options={airports}
+              options={toSearchQuery ? toAirportSearchResults : nearbyAirports}
               onSelect={(option) => {
                 setToLocation(option.value);
                 setToLocationLabel(option.label);
               }}
             />
-            <View className="gap-2">
+            <View className="gap-1">
               <Label>Departure Date</Label>
-              <Input
-                placeholder="MM/DD/YYYY"
+              <DatePicker
                 value={departureDate}
-                onChangeText={setDepartureDate}
+                onValueChange={setDepartureDate}
+                placeholder="Select departure date"
+                minDate={new Date().toISOString()}
+              />
+            </View>
+            <View className="gap-1">
+              <Label>Return Date</Label>
+              <DatePicker
+                value={returnDate}
+                onValueChange={setReturnDate}
+                placeholder="Select return date"
+                minDate={departureDate || new Date().toISOString()}
               />
             </View>
             <Button
@@ -204,3 +146,60 @@ export default function HomeScreen() {
     </ScrollView>
   );
 }
+
+const useUserLocation = () => {
+  const [status, requestPermission] = Location.useForegroundPermissions();
+  const [userLocation, setUserLocation] =
+    React.useState<Location.LocationObject | null>(null);
+
+  const getUserLocation = async () => {
+    if (status?.granted) {
+      const location = await Location.getLastKnownPositionAsync({
+        maxAge: 1000 * 60 * 60, // 1 hour
+      });
+      setUserLocation(location);
+    } else {
+      requestPermission();
+    }
+  };
+
+  useEffect(() => {
+    getUserLocation();
+  }, []);
+
+  return userLocation;
+};
+
+const useNearbyAirportsPrefill = (): SearchableInputOption[] => {
+  const userLocation = useUserLocation();
+  const nearbyAirports = useNearbyAirports(
+    userLocation
+      ? {
+          lat: userLocation?.coords.latitude,
+          lng: userLocation?.coords.longitude,
+        }
+      : null
+  );
+
+  return nearbyAirports.isFetched
+    ? nearbyAirports.data?.data.nearby?.map((airport) => ({
+        value: airport.navigation.relevantFlightParams.skyId,
+        label: airport.presentation.suggestionTitle,
+        description: airport.presentation.subtitle,
+      })) || []
+    : [];
+};
+
+const useAirportSearch = (searchQuery: string): SearchableInputOption[] => {
+  const airportSearch = useSearchAirports({
+    query: searchQuery,
+  });
+
+  return airportSearch.isFetched
+    ? airportSearch.data?.data.map((airport) => ({
+        value: airport.navigation.relevantFlightParams.skyId,
+        label: airport.presentation.suggestionTitle,
+        description: airport.presentation.subtitle,
+      })) || []
+    : [];
+};

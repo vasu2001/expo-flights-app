@@ -15,6 +15,9 @@ import { PortalHost } from "@rn-primitives/portal";
 import { setAndroidNavigationBar } from "~/lib/android-navigation-bar";
 import { SessionProvider, useSession } from "~/lib/auth-ctx";
 import { SplashScreenController } from "../splash";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "~/lib/query-client";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 export { ErrorBoundary } from "expo-router";
 
 const LIGHT_THEME: Theme = {
@@ -37,14 +40,18 @@ export default function RootLayout() {
   const { isDarkColorScheme } = useColorScheme();
 
   return (
-    <SessionProvider>
-      <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-        <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
-        <SplashScreenController />
-        <RootNavigator />
-        <PortalHost />
-      </ThemeProvider>
-    </SessionProvider>
+    <QueryClientProvider client={queryClient}>
+      <SessionProvider>
+        <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
+          <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
+          <SplashScreenController />
+          <GestureHandlerRootView>
+            <RootNavigator />
+            <PortalHost />
+          </GestureHandlerRootView>
+        </ThemeProvider>
+      </SessionProvider>
+    </QueryClientProvider>
   );
 }
 
