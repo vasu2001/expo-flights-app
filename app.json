@@ -36,6 +36,19 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "69342649-7a3e-49f6-95cb-bee5ea77b18e"
+      }
+    },
+    "owner": "vasu2001",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/69342649-7a3e-49f6-95cb-bee5ea77b18e"
     }
   }
 }
