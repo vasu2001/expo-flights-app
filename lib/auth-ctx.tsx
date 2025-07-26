@@ -42,7 +42,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log("user", user);
       setUser(user);
       setInitialized(true);
     });
