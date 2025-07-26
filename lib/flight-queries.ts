@@ -7,6 +7,7 @@ import type {
   NearbyAirportsResponse,
   SearchAirportsResponse,
   SearchFlightsResponse,
+  FlightDetailsRequest,
 } from "../api/flight-client";
 
 // Create a singleton instance of the FlightAPI
@@ -21,6 +22,8 @@ export const flightQueryKeys = {
     ["flights", "searchAirports", query] as const,
   searchFlights: (params: SearchFlightsRequest) =>
     ["flights", "searchFlights", params] as const,
+  flightDetails: (params: FlightDetailsRequest) =>
+    ["flights", "flightDetails", params] as const,
 } as const;
 
 /**
@@ -56,6 +59,16 @@ export function useSearchFlights(params: SearchFlightsRequest) {
     queryKey: flightQueryKeys.searchFlights(params),
     queryFn: () => flightAPI.searchFlights(params),
     enabled: false,
+    staleTime: 2 * 60 * 1000, // 2 minutes - flight data changes frequently
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
+}
+
+export function useFlightDetails(params: FlightDetailsRequest) {
+  return useQuery({
+    queryKey: flightQueryKeys.flightDetails(params),
+    queryFn: () => flightAPI.getFlightDetails(params),
+    enabled: true,
     staleTime: 2 * 60 * 1000, // 2 minutes - flight data changes frequently
     gcTime: 10 * 60 * 1000, // 10 minutes
   });

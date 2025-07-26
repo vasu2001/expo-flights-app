@@ -9,7 +9,7 @@ export default function NotFoundScreen() {
       <View className="flex-1 items-center justify-center">
         <Text>This screen doesn't exist.</Text>
 
-        <Link href="/(app)/index">
+        <Link href="/(app)/(home)">
           <Text>Go to home screen!</Text>
         </Link>
       </View>

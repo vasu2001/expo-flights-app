@@ -18,6 +18,7 @@ export default function AppLayout() {
 
   return (
     <Tabs
+      initialRouteName="(home)"
       screenOptions={{
         headerRight: () => <ThemeToggle />,
         tabBarActiveTintColor: "#0891b2", // sky-600
@@ -25,7 +26,7 @@ export default function AppLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="(home)"
         options={{
           title: "Home",
           tabBarLabel: "Home",

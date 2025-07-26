@@ -1,5 +1,6 @@
 import { DEFAULT_CONFIG, FlightAPIConfig } from "./config";
 import {
+  flightDetailsResponseSample,
   nearbyAirportsResponseSample,
   searchAirportsResponseSample,
   searchFlightsResponseSample,
@@ -11,11 +12,8 @@ import {
   SearchAirportsResponse,
   SearchFlightsRequest,
   SearchFlightsResponse,
-  ApiResponse,
-  AirportLocation,
-  AirportOption,
-  FlightItinerary,
-  FlightResult,
+  FlightDetailsRequest,
+  FlightDetailsResponse,
 } from "./types";
 
 export class FlightAPIError extends Error {
@@ -113,10 +111,7 @@ export class FlightAPI {
     return nearbyAirportsResponseSample;
     return this.makeRequest<NearbyAirportsResponse>(
       "/api/v1/flights/getNearByAirports",
-      {
-        lat: params.lat,
-        lng: params.lng,
-      }
+      params
     );
   }
 
@@ -131,9 +126,7 @@ export class FlightAPI {
     return searchAirportsResponseSample;
     return this.makeRequest<SearchAirportsResponse>(
       "/api/v1/flights/searchAirport",
-      {
-        query: params.query,
-      }
+      params
     );
   }
 
@@ -148,63 +141,22 @@ export class FlightAPI {
     return searchFlightsResponseSample;
     return this.makeRequest<SearchFlightsResponse>(
       "/api/v1/flights/searchFlights",
-      {
-        originSkyId: params.originSkyId,
-        destinationSkyId: params.destinationSkyId,
-        originEntityId: params.originEntityId,
-        destinationEntityId: params.destinationEntityId,
-        date: params.date,
-        returnDate: params.returnDate,
-        adults: params.adults,
-        cabinClass: params.cabinClass,
-        sortBy: params.sortBy,
-        childrens: params.childrens,
-        infants: params.infants,
-        currency: params.currency,
-        market: params.market,
-        countryCode: params.countryCode,
-      }
+      params
     );
   }
 
   /**
-   * Helper method to convert Location to AirportOption for UI usage
+   * Search for flights using the Sky Scrapper API
+   * @param params - Flight search parameters for Sky Scrapper
+   * @returns Promise with flight search results from Sky Scrapper
    */
-  static locationToAirportOption(location: AirportLocation): AirportOption {
-    return {
-      id: location.navigation.relevantFlightParams.skyId,
-      code: location.navigation.relevantFlightParams.skyId,
-      name: location.presentation.title,
-      city: location.presentation.title,
-      country: location.presentation.subtitle,
-      type: location.navigation.entityType.toLowerCase() as "airport" | "city",
-      entityId: location.navigation.entityId,
-      skyId: location.navigation.relevantFlightParams.skyId,
-    };
-  }
-
-  /**
-   * Helper method to convert FlightItinerary to FlightResult for UI usage
-   */
-  static itineraryToFlightResult(itinerary: FlightItinerary): FlightResult {
-    const outboundLeg = itinerary.legs[0];
-    const inboundLeg = itinerary.legs[1];
-
-    return {
-      id: itinerary.id,
-      price: itinerary.price,
-      duration: outboundLeg.durationInMinutes,
-      stops: outboundLeg.stopCount,
-      departure: outboundLeg.departure,
-      arrival: outboundLeg.arrival,
-      airline: outboundLeg.carriers.marketing[0]?.name || "Unknown",
-      airlineLogo: outboundLeg.carriers.marketing[0]?.logoUrl,
-      tags: itinerary.tags,
-      returnDeparture: inboundLeg?.departure,
-      returnArrival: inboundLeg?.arrival,
-      returnDuration: inboundLeg?.durationInMinutes,
-      returnStops: inboundLeg?.stopCount,
-      isRoundTrip: itinerary.legs.length > 1,
-    };
+  async getFlightDetails(
+    params: FlightDetailsRequest
+  ): Promise<FlightDetailsResponse> {
+    return flightDetailsResponseSample;
+    return this.makeRequest<FlightDetailsResponse>(
+      "/api/v1/flights/getFlightDetails",
+      params
+    );
   }
 }

@@ -6,7 +6,7 @@ export default function HomeStackLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: "Home",
+          title: "Search Flights",
           headerShown: false,
         }}
       />

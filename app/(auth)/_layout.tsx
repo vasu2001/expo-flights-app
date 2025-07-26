@@ -12,7 +12,7 @@ export default function AuthLayout() {
 
   // If user is authenticated, redirect to main app
   if (user) {
-    return <Redirect href="/(app)/index" />;
+    return <Redirect href="/(app)/(home)" />;
   }
 
   return (

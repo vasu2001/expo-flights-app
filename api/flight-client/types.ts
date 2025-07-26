@@ -290,11 +290,147 @@ export interface FlightResult {
   isRoundTrip?: boolean;
 }
 
-// Utility Types
-export type CabinClass = "economy" | "premium_economy" | "business" | "first";
-export type SortOption =
-  | "price"
-  | "duration"
-  | "departure_time"
-  | "arrival_time";
-export type Currency = "USD" | "EUR" | "GBP" | "CAD" | "AUD";
+// Sky Scrapper API Types
+export interface FlightDetails {
+  id: string;
+  airline: string;
+  airlineLogo?: string;
+  flightNumber: string;
+  departure: {
+    airport: string;
+    time: string;
+    terminal?: string;
+  };
+  arrival: {
+    airport: string;
+    time: string;
+    terminal?: string;
+  };
+  duration: string;
+  stops: number;
+  price: {
+    amount: number;
+    currency: string;
+    formatted: string;
+  };
+  cabinClass?: string;
+  aircraft?: string;
+  operatingAirline?: string;
+  bookingClass?: string;
+  fareBasis?: string;
+  refundable?: boolean;
+  changeable?: boolean;
+  baggage?: {
+    checked?: string;
+    carryOn?: string;
+  };
+  amenities?: string[];
+  warnings?: string[];
+}
+
+export interface FlightDetailsRequest {
+  itineraryId: string;
+  legs: string;
+  sessionId: string;
+  adults?: number;
+  children?: number;
+  infants?: number;
+  cabinClass?: "economy" | "premium_economy" | "business" | "first";
+  currency?: string;
+  market?: string;
+  countryCode?: string;
+}
+
+export interface FlightDetailsResponse {
+  status: boolean;
+  timestamp: number;
+  data: {
+    itinerary: Itinerary;
+    pollingCompleted: boolean;
+  };
+  message?: string;
+}
+
+// Types for the new structure
+export interface Itinerary {
+  legs: ItineraryLeg[];
+  pricingOptions: PricingOption[];
+  isTransferRequired: boolean;
+  destinationImage: string;
+  operatingCarrierSafetyAttributes: SafetyAttribute[];
+  flexibleTicketPolicies: any[];
+}
+
+export interface ItineraryLeg {
+  id: string;
+  origin: ItineraryPlace;
+  destination: ItineraryPlace;
+  segments: ItinerarySegment[];
+  duration: number;
+  stopCount: number;
+  departure: string;
+  arrival: string;
+  dayChange: number;
+}
+
+export interface ItineraryPlace {
+  id: string;
+  name: string;
+  displayCode: string;
+  city: string;
+}
+
+export interface ItinerarySegment {
+  id: string;
+  origin: ItineraryPlace;
+  destination: ItineraryPlace;
+  duration: number;
+  dayChange: number;
+  flightNumber: string;
+  departure: string;
+  arrival: string;
+  marketingCarrier: ItineraryCarrier;
+  operatingCarrier: ItineraryCarrier;
+}
+
+export interface ItineraryCarrier {
+  id: string;
+  name: string;
+  displayCode: string;
+  displayCodeType: string;
+  logo: string;
+  altId: string;
+}
+
+export interface PricingOption {
+  agents: PricingAgent[];
+  totalPrice: number;
+}
+
+export interface PricingAgent {
+  id: string;
+  name: string;
+  isCarrier: boolean;
+  bookingProposition: string;
+  url: string;
+  price: number;
+  rating: {
+    value: number;
+    count: number;
+  };
+  updateStatus: string;
+  segments: ItinerarySegment[];
+  isDirectDBookUrl: boolean;
+  quoteAge: number;
+}
+
+export interface SafetyAttribute {
+  carrierID: string;
+  carrierName: string;
+  faceMasksCompulsory: boolean | null;
+  aircraftDeepCleanedDaily: boolean | null;
+  attendantsWearPPE: boolean | null;
+  cleaningPacksProvided: boolean | null;
+  foodServiceChanges: boolean | null;
+  safetyUrl: string | null;
+}

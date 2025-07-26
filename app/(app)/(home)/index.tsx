@@ -73,8 +73,18 @@ export default function HomeScreen() {
   const handleFlightPress = (flight: FlightItinerary) => {
     // Navigate to flight details page
     router.push({
-      pathname: "/(app)/index/flight-details",
-      params: { flightId: flight.id },
+      pathname: "/(app)/(home)/flight-details",
+      params: {
+        sessionId: flightsSearchData?.sessionId,
+        itineraryId: flight.id,
+        legs: JSON.stringify(
+          flight.legs.map((leg) => ({
+            origin: leg.origin.id,
+            destination: leg.destination.id,
+            date: leg.departure.split("T")[0],
+          }))
+        ),
+      },
     });
   };
 

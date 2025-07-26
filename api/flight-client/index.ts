@@ -7,9 +7,6 @@ export { FlightAPI, FlightAPIError } from "./client";
 // Export the config type
 export { type FlightAPIConfig } from "./config";
 
-// Export utility functions
-export * from "./utils";
-
 // Re-export commonly used types for convenience
 export type {
   ApiResponse,
@@ -22,4 +19,8 @@ export type {
   AirportOption,
   FlightSearchForm,
   FlightResult,
+  // Sky Scrapper types
+  FlightDetails as SkyScrapperFlight,
+  FlightDetailsRequest as SkyScrapperSearchRequest,
+  FlightDetailsResponse as SkyScrapperSearchResponse,
 } from "./types";
