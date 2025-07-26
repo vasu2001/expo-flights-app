@@ -59,7 +59,8 @@ export default function ProfileScreen() {
             </Avatar>
             <CardTitle className="text-xl">Rick Sanchez</CardTitle>
             <CardDescription className="text-base">
-              rick.sanchez@example.com
+              This is a static profile page just for demo purposes, There is no
+              user metadata attached to auth yet
             </CardDescription>
           </CardHeader>
         </Card>
