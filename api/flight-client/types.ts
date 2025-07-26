@@ -11,12 +11,12 @@ export interface FlightPlace {
   flightPlaceId: string;
   displayCode: string;
   name: string;
-  type: "Airport" | "City";
+  type: string; // Changed from union type to string to match sample
   parent?: {
     flightPlaceId: string;
     displayCode: string;
     name: string;
-    type: "City";
+    type: string; // Changed from union type to string to match sample
   };
 }
 
@@ -90,7 +90,7 @@ export interface Carrier {
 
 export interface Carriers {
   marketing: Carrier[];
-  operationType: "fully_operated" | "codeshare";
+  operationType: string; // Changed from union type to string to match sample
 }
 
 // Flight Segment Types
@@ -155,9 +155,9 @@ export interface FlightItinerary {
   score: number;
 }
 
-// Search Context
+// Search Context - Updated to match sample response
 export interface SearchContext {
-  status: "incomplete" | "complete";
+  status: string; // Changed from union type to string to match sample
   totalResults: number;
 }
 
@@ -256,6 +256,8 @@ export interface AirportOption {
   city: string;
   country: string;
   type: "airport" | "city";
+  entityId?: string;
+  skyId?: string;
 }
 
 export interface FlightSearchForm {
@@ -281,6 +283,11 @@ export interface FlightResult {
   airline: string;
   airlineLogo?: string;
   tags: string[];
+  returnDeparture?: string;
+  returnArrival?: string;
+  returnDuration?: number;
+  returnStops?: number;
+  isRoundTrip?: boolean;
 }
 
 // Utility Types

@@ -2,6 +2,7 @@ import { DEFAULT_CONFIG, FlightAPIConfig } from "./config";
 import {
   nearbyAirportsResponseSample,
   searchAirportsResponseSample,
+  searchFlightsResponseSample,
 } from "./sample-response";
 import {
   NearbyAirportsRequest,
@@ -11,6 +12,10 @@ import {
   SearchFlightsRequest,
   SearchFlightsResponse,
   ApiResponse,
+  AirportLocation,
+  AirportOption,
+  FlightItinerary,
+  FlightResult,
 } from "./types";
 
 export class FlightAPIError extends Error {
@@ -140,6 +145,7 @@ export class FlightAPI {
   async searchFlights(
     params: SearchFlightsRequest
   ): Promise<SearchFlightsResponse> {
+    return searchFlightsResponseSample;
     return this.makeRequest<SearchFlightsResponse>(
       "/api/v1/flights/searchFlights",
       {
@@ -164,23 +170,23 @@ export class FlightAPI {
   /**
    * Helper method to convert Location to AirportOption for UI usage
    */
-  static locationToAirportOption(location: any): any {
+  static locationToAirportOption(location: AirportLocation): AirportOption {
     return {
-      id: location.skyId,
-      code: location.skyId,
+      id: location.navigation.relevantFlightParams.skyId,
+      code: location.navigation.relevantFlightParams.skyId,
       name: location.presentation.title,
       city: location.presentation.title,
       country: location.presentation.subtitle,
       type: location.navigation.entityType.toLowerCase() as "airport" | "city",
-      entityId: location.entityId,
-      skyId: location.skyId,
+      entityId: location.navigation.entityId,
+      skyId: location.navigation.relevantFlightParams.skyId,
     };
   }
 
   /**
    * Helper method to convert FlightItinerary to FlightResult for UI usage
    */
-  static itineraryToFlightResult(itinerary: any): any {
+  static itineraryToFlightResult(itinerary: FlightItinerary): FlightResult {
     const outboundLeg = itinerary.legs[0];
     const inboundLeg = itinerary.legs[1];
 
